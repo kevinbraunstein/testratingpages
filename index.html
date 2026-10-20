@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HRI iframe test</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; color: #222; }
+    h1 { font-size: 1.4em; margin-bottom: 4px; }
+    p { margin: 4px 0 16px; color: #555; }
+    .frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+    .card { border: 1px solid #ccc; border-radius: 6px; padding: 12px; }
+    .card h2 { font-size: 1.1em; margin: 0 0 6px; }
+    .meta { font-size: 0.9em; color: #555; margin-bottom: 8px; }
+    .meta a { margin-left: 8px; }
+    .loads { font-weight: bold; }
+    iframe { width: 100%; height: 600px; border: 1px solid #999; }
+    button { margin-bottom: 16px; padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <h1>HRI iframe test</h1>
+  <p>A bypassed page that embeds two Threat Risk test pages. A load count that keeps climbing means the iframe is reloading in a loop.</p>
+  <button id="reload">Reload both iframes</button>
+
+  <div class="frames">
+    <div class="card">
+      <h2>Threat risk level 7</h2>
+      <div class="meta">
+        Loads: <span class="loads" id="loads-7">0</span>
+        <span id="last-7"></span>
+        <a href="https://testrating.webfilter.bluecoat.com/threatrisk/level/7?locale=en_US" target="_blank" rel="noopener">Open directly</a>
+      </div>
+      <iframe id="frame-7" src="https://testrating.webfilter.bluecoat.com/threatrisk/level/7?locale=en_US"></iframe>
+    </div>
+
+    <div class="card">
+      <h2>Threat risk level 5</h2>
+      <div class="meta">
+        Loads: <span class="loads" id="loads-5">0</span>
+        <span id="last-5"></span>
+        <a href="https://testrating.webfilter.bluecoat.com/threatrisk/level/5?locale=en_US" target="_blank" rel="noopener">Open directly</a>
+      </div>
+      <iframe id="frame-5" src="https://testrating.webfilter.bluecoat.com/threatrisk/level/5?locale=en_US"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // The iframes are cross-origin, so only their load events are visible here. Each navigation inside an
+    // iframe (including a reload) fires one.
+    ["7", "5"].forEach(function (level) {
+      var frame = document.getElementById("frame-" + level);
+      var count = 0;
+      frame.addEventListener("load", function () {
+        count += 1;
+        document.getElementById("loads-" + level).textContent = count;
+        document.getElementById("last-" + level).textContent = "(last at " + new Date().toLocaleTimeString() + ")";
+      });
+    });
+
+    document.getElementById("reload").addEventListener("click", function () {
+      ["7", "5"].forEach(function (level) {
+        var frame = document.getElementById("frame-" + level);
+        frame.src = frame.src;
+      });
+    });
+  </script>
+</body>
+</html>
